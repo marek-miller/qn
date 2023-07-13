@@ -2,11 +2,12 @@
 name = "qn"
 version = "0.1.0"
 edition = "2021"
-description = "Qubit type"
+description = "Quantum type system"
 homepage = "https://github.com/marek-miller/qn"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/marek-miller/qn.git"
 
-
 [dependencies]
+num = "0.4.1"
+rand = "0.8.5"
