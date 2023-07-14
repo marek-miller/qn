@@ -99,4 +99,9 @@ where
     ) -> Option<(Qubit<'_, T>, Qubit<'_, T>)> {
         Qubit::new_pair(self, index1, index2)
     }
+
+    /// Get iterator over all qubits in register
+    pub fn qubit_iter_mut(&mut self) -> impl Iterator<Item = Qubit<'_, T>> {
+        Qubit::new_iter_mut(self)
+    }
 }

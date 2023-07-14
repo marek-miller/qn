@@ -91,6 +91,19 @@ where
         Some((qb1, qb2))
     }
 
+    /// Get iterator over all qubits in register
+    pub fn new_iter_mut(
+        qureg: &'a mut Register<T>
+    ) -> impl Iterator<Item = Qubit<'a, T>> {
+        let num_qubits = qureg.num_qubits().get();
+        let lock = Arc::new(Mutex::new(qureg));
+
+        (0..num_qubits).map(move |i| Self {
+            qureg: lock.clone(),
+            index: i,
+        })
+    }
+
     /// Get index of this qubit in the underlying register
     #[must_use]
     pub fn index(&self) -> u16 {
