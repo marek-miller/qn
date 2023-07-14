@@ -7,6 +7,7 @@ use num::{
 use rand::{
     distributions::{
         Bernoulli,
+        BernoulliError,
         Distribution,
     },
     SeedableRng,
@@ -32,9 +33,23 @@ impl<T> Register<T>
 where
     T: Float,
 {
-    /// Initialize a new quantum register of `n` qubits in a zero state.
+    /// Initialize a new quantum register of `n` qubits in the zero state.
     ///
     /// Seed internal RNG with `seed`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use std::num::NonZeroU16;
+    /// # use qn::{Bit, Register};
+    /// let num_qubits = NonZeroU16::new(8).unwrap();
+    /// let seed = 123;
+    /// let mut qureg: Register<f64> = Register::new(num_qubits, seed);
+    ///
+    /// for mut qubit in qureg.qubit_iter() {
+    ///     assert_eq!(qubit.measure(), Bit::ZERO);
+    /// }
+    /// ```
     #[must_use]
     pub fn new(
         num_qubits: NonZeroU16,
@@ -49,21 +64,24 @@ where
         }
     }
 
+    /// Draw from Bernoulli distribution with probability of success `p`.
+    ///
+    /// Uses internal RNG.
     pub fn bernoulli(
         &mut self,
         p: f64,
-    ) -> bool {
-        let d = Bernoulli::new(p).unwrap();
-        d.sample(&mut self.rng)
+    ) -> Result<bool, BernoulliError> {
+        let d = Bernoulli::new(p)?;
+        Ok(d.sample(&mut self.rng))
     }
 
-    /// Get the number of qubits in this `Qureg`
+    /// Get the number of qubits.
     #[must_use]
     pub fn num_qubits(&self) -> NonZeroU16 {
         self.num_qubits
     }
 
-    /// Get complex amplitudes of the computational basis states
+    /// Get complex amplitudes of the computational basis states.
     #[must_use]
     pub fn as_slice(&self) -> &[Complex<T>] {
         &self.amp
@@ -77,7 +95,7 @@ where
 
     /// Get a qubit.
     ///
-    /// Returns `None` is index is larger or equal than `qureg.num_qubits()`
+    /// Returns `None` if index is larger or equal than `self.num_qubits()`
     pub fn qubit(
         &mut self,
         index: u16,
@@ -90,7 +108,7 @@ where
     /// # Result
     ///
     /// Returns `None`
-    /// - if any of indices is larger or equal than `qureg.num_qubits()`
+    /// - if any of indices is larger or equal than `self.num_qubits()`
     /// - if indices are equal
     pub fn qubit_pair(
         &mut self,
@@ -100,8 +118,8 @@ where
         Qubit::new_pair(self, index1, index2)
     }
 
-    /// Get iterator over all qubits in register
-    pub fn qubit_iter_mut(&mut self) -> impl Iterator<Item = Qubit<'_, T>> {
-        Qubit::new_iter_mut(self)
+    /// Create an iterator over all qubits in register.
+    pub fn qubit_iter(&mut self) -> impl Iterator<Item = Qubit<'_, T>> {
+        Qubit::new_iter(self)
     }
 }

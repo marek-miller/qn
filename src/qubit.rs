@@ -92,7 +92,7 @@ where
     }
 
     /// Get iterator over all qubits in register
-    pub fn new_iter_mut(
+    pub fn new_iter(
         qureg: &'a mut Register<T>
     ) -> impl Iterator<Item = Qubit<'a, T>> {
         let num_qubits = qureg.num_qubits().get();
@@ -111,28 +111,39 @@ where
     }
 
     /// Check if other qubit belongs to the same register
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use std::num::NonZeroU16;
+    /// # use qn::Register;
+    /// let num_qubits = NonZeroU16::new(2).unwrap();
+    /// let seed = 123;
+    /// let mut qureg: Register<f64> = Register::new(num_qubits, seed);
+    /// let (qb0, qb1) = qureg.qubit_pair(0, 1).unwrap();
+    ///
+    /// assert!(qb0.is_from_same_qureg(&qb1));
+    /// ```
     #[must_use]
     pub fn is_from_same_qureg(
         &self,
-        other_qubit: &Qubit<'_, T>,
+        other_qubit: &Qubit<'a, T>,
     ) -> bool {
-        // Note the new scope: other_qubit lock is dropped immediately
-        let other_qureg_ptr =
-            { *other_qubit.qureg.lock().unwrap() as *const _ };
-        let qureg_ptr = *self.qureg.lock().unwrap() as *const _;
-
-        qureg_ptr == other_qureg_ptr
+        // Two qubits belong to the same register, if and only if they share
+        // the same mutex guarding access to &mut Register.
+        Arc::<_>::as_ptr(&self.qureg) == Arc::<_>::as_ptr(&other_qubit.qureg)
     }
 
     /// Measure the qubit.
     pub fn measure(&mut self) -> Bit {
-        let mut amp_sq = [T::zero(); 2];
-
         let mut qureg = self.qureg.lock().unwrap();
+
         let lower_bits = 1 << self.index;
         let upper_bits = 1 << (qureg.num_qubits().get() - self.index - 1);
         let amp_buf = qureg.as_mut_slice();
 
+        // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
+        let mut amp_sq = [T::zero(); 2];
         for k in 0..upper_bits {
             for j in 0..=1 {
                 for i in 0..lower_bits {
@@ -142,10 +153,11 @@ where
             }
         }
 
+        // project the state onto random outcome
         let p = T::to_f64(&amp_sq[1]).unwrap();
-        let outcome = qureg.bernoulli(p);
+        let outcome = qureg.bernoulli(p).unwrap();
 
-        // zero amplitudes from (1-outcome), normalize the rest
+        // zero amplitudes corresponding to (1-outcome), normalize the rest
         let outcome_idx = usize::from(outcome);
         let amp_buf = qureg.as_mut_slice();
         let norm_factor = amp_sq[outcome_idx].sqrt();
