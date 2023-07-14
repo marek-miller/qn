@@ -26,3 +26,4 @@ fn qureg_set_real(
 
 mod one_qubit;
 mod two_qubits;
+mod two_qubits_nonlocal;
