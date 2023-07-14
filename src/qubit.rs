@@ -66,4 +66,17 @@ impl<'a, T: Float> Qubit<'a, T> {
     pub fn index(&self) -> u16 {
         self.index
     }
+
+    /// Check if other qubit belongs to the same register
+    pub fn is_from_same_qureg(
+        &self,
+        other_qubit: &Qubit<'_, T>,
+    ) -> bool {
+        // Note the new scope: other_qubit lock is dropped immediately
+        let other_qureg_ptr =
+            { *other_qubit.qureg.lock().unwrap() as *const _ };
+        let qureg_ptr = *self.qureg.lock().unwrap() as *const _;
+
+        qureg_ptr == other_qureg_ptr
+    }
 }
