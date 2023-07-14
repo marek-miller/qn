@@ -9,13 +9,13 @@ use std::{
 use num::Complex;
 use qn::{
     Bit,
-    Qureg,
+    Register,
 };
 
 #[test]
 fn q2_01() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(1.);
     qureg.as_mut_slice()[1] = Complex::from(0.);
@@ -30,7 +30,7 @@ fn q2_01() {
 #[test]
 fn q2_02() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(0.);
     qureg.as_mut_slice()[1] = Complex::from(1.);
@@ -45,7 +45,7 @@ fn q2_02() {
 #[test]
 fn q2_03() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(0.);
     qureg.as_mut_slice()[1] = Complex::from(0.);
@@ -60,7 +60,7 @@ fn q2_03() {
 #[test]
 fn q2_03_reversed() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(0.);
     qureg.as_mut_slice()[1] = Complex::from(0.);
@@ -75,7 +75,7 @@ fn q2_03_reversed() {
 #[test]
 fn q2_03_opposite_order() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(0.);
     qureg.as_mut_slice()[1] = Complex::from(0.);
@@ -90,7 +90,7 @@ fn q2_03_opposite_order() {
 #[test]
 fn q2_04() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 1);
+    let mut qureg = Register::new(num_qubits, 1);
 
     qureg.as_mut_slice()[0] = Complex::from(0.);
     qureg.as_mut_slice()[1] = Complex::from(0.);
@@ -105,7 +105,7 @@ fn q2_04() {
 #[test]
 fn q2_correlated_01() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         qureg.as_mut_slice()[0] = Complex::from(SQRT_2.recip());
@@ -136,7 +136,7 @@ fn q2_correlated_01() {
 #[test]
 fn q2_correlated_01_one_measurement() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         qureg.as_mut_slice()[0] = Complex::from(SQRT_2.recip());
@@ -165,7 +165,7 @@ fn q2_correlated_01_one_measurement() {
 #[test]
 fn q2_correlated_02() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         qureg.as_mut_slice()[0] = Complex::from(0.);
@@ -196,7 +196,7 @@ fn q2_correlated_02() {
 #[test]
 fn q2_correlated_03() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         // |00> + |01> = |0>(|0> + |1>)
@@ -216,7 +216,7 @@ fn q2_correlated_03() {
             SQRT_2.recip(),
             0.,
         ]) {
-            assert!((x.re - y).abs() < EPSILON, "{:?}", x);
+            assert!((x.re - y).abs() < EPSILON, "{x:?}");
             assert!(x.im.abs() < EPSILON);
         }
     }
@@ -225,7 +225,7 @@ fn q2_correlated_03() {
 #[test]
 fn q2_correlated_04() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         // |10> + |11> = |1>(|0> + |1>)
@@ -245,7 +245,7 @@ fn q2_correlated_04() {
             0.,
             SQRT_2.recip(),
         ]) {
-            assert!((x.re - y).abs() < EPSILON, "{:?}", x);
+            assert!((x.re - y).abs() < EPSILON, "{x:?}");
             assert!(x.im.abs() < EPSILON);
         }
     }
@@ -254,7 +254,7 @@ fn q2_correlated_04() {
 #[test]
 fn q2_correlated_05() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         // |00> + |10> = (|0> + |1>)|0>
@@ -274,7 +274,7 @@ fn q2_correlated_05() {
             0.,
             0.,
         ]) {
-            assert!((x.re - y).abs() < EPSILON, "{:?}", x);
+            assert!((x.re - y).abs() < EPSILON, "{x:?}");
             assert!(x.im.abs() < EPSILON);
         }
     }
@@ -283,7 +283,7 @@ fn q2_correlated_05() {
 #[test]
 fn q2_correlated_06() {
     let num_qubits = NonZeroU16::new(2).unwrap();
-    let mut qureg = Qureg::new(num_qubits, 123);
+    let mut qureg = Register::new(num_qubits, 123);
 
     for _ in 0..100 {
         // |01> + |11> = (|0> + |1>)|1>
@@ -303,7 +303,7 @@ fn q2_correlated_06() {
             SQRT_2.recip(),
             SQRT_2.recip(),
         ]) {
-            assert!((x.re - y).abs() < EPSILON, "{:?}", x);
+            assert!((x.re - y).abs() < EPSILON, "{x:?}");
             assert!(x.im.abs() < EPSILON);
         }
     }

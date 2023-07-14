@@ -14,23 +14,23 @@ use rand::{
 use rand_chacha::ChaCha8Rng;
 
 use crate::{
-    QFloat,
+    Float,
     Qubit,
 };
 
 /// Quantum register
-pub struct Qureg<T>
+pub struct Register<T>
 where
-    T: QFloat,
+    T: Float,
 {
     rng:        ChaCha8Rng,
     num_qubits: NonZeroU16,
     amp:        Vec<Complex<T>>,
 }
 
-impl<T> Qureg<T>
+impl<T> Register<T>
 where
-    T: QFloat,
+    T: Float,
 {
     /// Initialize a new quantum register of `n` qubits in a zero state.
     ///

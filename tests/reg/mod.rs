@@ -1,30 +1,30 @@
 use std::num::NonZeroU16;
 
 use num::Complex;
-use qn::Qureg;
+use qn::Register;
 
 #[test]
 fn init_01() {
-    let _ = Qureg::<f32>::new(NonZeroU16::try_from(1).unwrap(), 1);
-    let _ = Qureg::<f32>::new(NonZeroU16::try_from(2).unwrap(), 1);
-    let _ = Qureg::<f32>::new(NonZeroU16::try_from(3).unwrap(), 1);
+    let _ = Register::<f32>::new(NonZeroU16::try_from(1).unwrap(), 1);
+    let _ = Register::<f32>::new(NonZeroU16::try_from(2).unwrap(), 1);
+    let _ = Register::<f32>::new(NonZeroU16::try_from(3).unwrap(), 1);
 }
 
 #[test]
 fn num_qubits_01() {
     let num_qubits = NonZeroU16::try_from(1).unwrap();
-    let qureg = Qureg::<f32>::new(num_qubits, 1);
+    let qureg = Register::<f32>::new(num_qubits, 1);
     assert_eq!(qureg.num_qubits(), num_qubits);
 
     let num_qubits = NonZeroU16::try_from(3).unwrap();
-    let qureg = Qureg::<f32>::new(num_qubits, 1);
+    let qureg = Register::<f32>::new(num_qubits, 1);
     assert_eq!(qureg.num_qubits(), num_qubits);
 }
 
 #[test]
 fn as_slice_01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let qureg = Qureg::<f32>::new(num_qubits, 1);
+    let qureg = Register::<f32>::new(num_qubits, 1);
 
     assert_eq!(qureg.as_slice()[0], Complex::from(1.));
     assert_eq!(qureg.as_slice()[1], Complex::from(0.));
@@ -35,7 +35,7 @@ fn as_slice_01() {
 #[test]
 fn as_mut_slice_01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let mut qureg = Qureg::<f32>::new(num_qubits, 1);
+    let mut qureg = Register::<f32>::new(num_qubits, 1);
 
     let slice = qureg.as_mut_slice();
     slice[0] = Complex::from(4.);
@@ -52,7 +52,7 @@ fn as_mut_slice_01() {
 #[test]
 fn get_qubit_01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let mut qureg = Qureg::<f32>::new(num_qubits, 1);
+    let mut qureg = Register::<f32>::new(num_qubits, 1);
 
     let qubit = qureg.qubit(0);
     assert!(qubit.is_some());
@@ -67,7 +67,7 @@ fn get_qubit_01() {
 #[test]
 fn get_qubit_pair01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let mut qureg = Qureg::<f32>::new(num_qubits, 1);
+    let mut qureg = Register::<f32>::new(num_qubits, 1);
 
     let qb = qureg.qubit_pair(0, 1);
     assert!(qb.is_some());

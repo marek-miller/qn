@@ -9,8 +9,8 @@ use num::{
 };
 
 use crate::{
-    QFloat,
-    Qureg,
+    Float,
+    Register,
 };
 
 /// Classical bit with two possible values (ZERO and ONE)
@@ -22,9 +22,10 @@ pub enum Bit {
 
 impl From<bool> for Bit {
     fn from(value: bool) -> Self {
-        match value {
-            false => Self::ZERO,
-            true => Self::ONE,
+        if value {
+            Self::ONE
+        } else {
+            Self::ZERO
         }
     }
 }
@@ -32,21 +33,21 @@ impl From<bool> for Bit {
 /// A representation of a qubit in a quantum register.
 pub struct Qubit<'a, T>
 where
-    T: QFloat,
+    T: Float,
 {
-    qureg: Arc<Mutex<&'a mut Qureg<T>>>,
+    qureg: Arc<Mutex<&'a mut Register<T>>>,
     index: u16,
 }
 
 impl<'a, T> Qubit<'a, T>
 where
-    T: QFloat,
+    T: Float,
 {
     /// Derive a single qubit from a quantum register.
     ///
     /// Returns `None` is index is larger or equal than `qureg.num_qubits()`
     pub fn new(
-        qureg: &'a mut Qureg<T>,
+        qureg: &'a mut Register<T>,
         index: u16,
     ) -> Option<Qubit<'_, T>> {
         if index >= qureg.num_qubits().get() {
@@ -67,7 +68,7 @@ where
     /// - if any of indices is larger or equal than `qureg.num_qubits()`
     /// - if indices are equal
     pub fn new_pair(
-        qureg: &'a mut Qureg<T>,
+        qureg: &'a mut Register<T>,
         index1: u16,
         index2: u16,
     ) -> Option<(Qubit<'_, T>, Qubit<'_, T>)> {
@@ -91,11 +92,13 @@ where
     }
 
     /// Get index of this qubit in the underlying register
+    #[must_use]
     pub fn index(&self) -> u16 {
         self.index
     }
 
     /// Check if other qubit belongs to the same register
+    #[must_use]
     pub fn is_from_same_qureg(
         &self,
         other_qubit: &Qubit<'_, T>,
@@ -130,10 +133,7 @@ where
         let outcome = qureg.bernoulli(p);
 
         // zero amplitudes from (1-outcome), normalize the rest
-        let outcome_idx = match outcome {
-            false => 0,
-            true => 1,
-        };
+        let outcome_idx = usize::from(outcome);
         let amp_buf = qureg.as_mut_slice();
         let norm_factor = amp_sq[outcome_idx].sqrt();
         for k in 0..upper_bits {

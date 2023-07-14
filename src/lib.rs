@@ -6,10 +6,9 @@ use std::ops::{
     SubAssign,
 };
 
-use num::Float;
-
-pub trait QFloat:
-    Float
+/// Floating point number abstraction
+pub trait Float:
+    num::Float
     + Sync
     + Send
     + AddAssign<Self>
@@ -20,8 +19,8 @@ pub trait QFloat:
 {
 }
 
-impl QFloat for f32 {}
-impl QFloat for f64 {}
+impl Float for f32 {}
+impl Float for f64 {}
 
 mod qubit;
 pub use qubit::{
@@ -29,5 +28,5 @@ pub use qubit::{
     Qubit,
 };
 
-mod qureg;
-pub use qureg::Qureg;
+mod reg;
+pub use reg::Register;
