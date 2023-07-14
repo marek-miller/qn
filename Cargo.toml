@@ -2,7 +2,7 @@
 name = "qn"
 version = "0.1.0"
 edition = "2021"
-description = "Quantum type system"
+description = "Non-local qubits"
 homepage = "https://github.com/marek-miller/qn"
 license = "MIT"
 readme = "README.md"
