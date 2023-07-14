@@ -3,9 +3,18 @@ use std::sync::{
     Mutex,
 };
 
-use num::Float;
+use num::{
+    Complex,
+    Float,
+    Zero,
+};
 
 use crate::Qureg;
+
+pub enum Bit {
+    ZERO,
+    ONE,
+}
 
 /// A representation of a qubit in a quantum register.
 pub struct Qubit<'a, T: Float> {
@@ -78,5 +87,48 @@ impl<'a, T: Float> Qubit<'a, T> {
         let qureg_ptr = *self.qureg.lock().unwrap() as *const _;
 
         qureg_ptr == other_qureg_ptr
+    }
+
+    /// Measure the qubit.
+    pub fn measure(&mut self) -> Bit {
+        let mut amp = [Complex::<T>::zero(); 2];
+
+        let outcome = {
+            let mut qureg = self.qureg.lock().unwrap();
+            let lower_bits = 1 << self.index;
+            let upper_bits = 1 << (qureg.num_qubits().get() - self.index - 1);
+            let amp_buf = qureg.as_mut_slice();
+
+            for k in 0..upper_bits {
+                for j in 0..=1 {
+                    for i in 0..lower_bits {
+                        amp[j] = amp[j] + amp_buf[i + lower_bits * (j + 2 * k)];
+                    }
+                }
+            }
+
+            // TODO: impl. pseudo RNG in qureg
+            let outcome = 0; // for now
+            let outcome_amp = amp[outcome];
+
+            // zero amplitudes from (1-outcome), normalize the rest
+            for k in 0..upper_bits {
+                for i in 0..lower_bits {
+                    amp_buf[i + lower_bits * ((1 - outcome) + 2 * k)] =
+                        Complex::zero();
+                    amp_buf[i + lower_bits * (outcome + 2 * k)] = amp_buf
+                        [i + lower_bits * (outcome + 2 * k)]
+                        / outcome_amp;
+                }
+            }
+            outcome
+            // qureg is dropped here
+        };
+
+        match outcome {
+            0 => Bit::ZERO,
+            1 => Bit::ONE,
+            _ => panic!("outcome should always be 0 or 1"),
+        }
     }
 }
