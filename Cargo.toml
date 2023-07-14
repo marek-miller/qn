@@ -1,12 +1,14 @@
 [package]
-name = "qn"
-version = "0.1.1"
-edition = "2021"
+categories = ["science", "simulation", "science:physics"]
 description = "Non-local qubits"
+edition = "2021"
 homepage = "https://github.com/marek-miller/qn"
+keywords = ["quantum", "simulation", "qubit", "non-local"]
 license = "MIT"
+name = "qn"
 readme = "README.md"
 repository = "https://github.com/marek-miller/qn.git"
+version = "0.1.1"
 
 [dependencies]
 num = "0.4.1"
