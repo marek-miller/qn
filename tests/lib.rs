@@ -1,3 +1,4 @@
+#[must_use]
 pub fn does_it_work(
     left: usize,
     right: usize,
