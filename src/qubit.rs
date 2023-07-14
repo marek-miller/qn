@@ -5,24 +5,43 @@ use std::sync::{
 
 use num::{
     Complex,
-    Float,
     Zero,
 };
 
-use crate::Qureg;
+use crate::{
+    QFloat,
+    Qureg,
+};
 
+/// Classical bit with two possible values (ZERO and ONE)
+#[derive(Debug, PartialEq)]
 pub enum Bit {
     ZERO,
     ONE,
 }
 
+impl From<bool> for Bit {
+    fn from(value: bool) -> Self {
+        match value {
+            false => Self::ZERO,
+            true => Self::ONE,
+        }
+    }
+}
+
 /// A representation of a qubit in a quantum register.
-pub struct Qubit<'a, T: Float> {
+pub struct Qubit<'a, T>
+where
+    T: QFloat,
+{
     qureg: Arc<Mutex<&'a mut Qureg<T>>>,
     index: u16,
 }
 
-impl<'a, T: Float> Qubit<'a, T> {
+impl<'a, T> Qubit<'a, T>
+where
+    T: QFloat,
+{
     /// Derive a single qubit from a quantum register.
     ///
     /// Returns `None` is index is larger or equal than `qureg.num_qubits()`
@@ -91,44 +110,39 @@ impl<'a, T: Float> Qubit<'a, T> {
 
     /// Measure the qubit.
     pub fn measure(&mut self) -> Bit {
-        let mut amp = [Complex::<T>::zero(); 2];
+        let mut amp_sq = [T::zero(); 2];
 
-        let outcome = {
-            let mut qureg = self.qureg.lock().unwrap();
-            let lower_bits = 1 << self.index;
-            let upper_bits = 1 << (qureg.num_qubits().get() - self.index - 1);
-            let amp_buf = qureg.as_mut_slice();
+        let mut qureg = self.qureg.lock().unwrap();
+        let lower_bits = 1 << self.index;
+        let upper_bits = 1 << (qureg.num_qubits().get() - self.index - 1);
+        let amp_buf = qureg.as_mut_slice();
 
-            for k in 0..upper_bits {
-                for j in 0..=1 {
-                    for i in 0..lower_bits {
-                        amp[j] = amp[j] + amp_buf[i + lower_bits * (j + 2 * k)];
-                    }
-                }
-            }
-
-            // TODO: impl. pseudo RNG in qureg
-            let outcome = 0; // for now
-            let outcome_amp = amp[outcome];
-
-            // zero amplitudes from (1-outcome), normalize the rest
-            for k in 0..upper_bits {
+        for k in 0..upper_bits {
+            for j in 0..=1 {
                 for i in 0..lower_bits {
-                    amp_buf[i + lower_bits * ((1 - outcome) + 2 * k)] =
-                        Complex::zero();
-                    amp_buf[i + lower_bits * (outcome + 2 * k)] = amp_buf
-                        [i + lower_bits * (outcome + 2 * k)]
-                        / outcome_amp;
+                    amp_sq[j] +=
+                        amp_buf[i + lower_bits * (j + 2 * k)].norm_sqr();
                 }
             }
-            outcome
-            // qureg is dropped here
-        };
-
-        match outcome {
-            0 => Bit::ZERO,
-            1 => Bit::ONE,
-            _ => panic!("outcome should always be 0 or 1"),
         }
+
+        let p = T::to_f64(&amp_sq[1]).unwrap();
+        let outcome = qureg.bernoulli(p);
+
+        // zero amplitudes from (1-outcome), normalize the rest
+        let outcome_idx = match outcome {
+            false => 0,
+            true => 1,
+        };
+        let amp_buf = qureg.as_mut_slice();
+        let norm_factor = amp_sq[outcome_idx].sqrt();
+        for k in 0..upper_bits {
+            for i in 0..lower_bits {
+                amp_buf[i + lower_bits * ((1 - outcome_idx) + 2 * k)] =
+                    Complex::zero();
+                amp_buf[i + lower_bits * (outcome_idx + 2 * k)] /= norm_factor;
+            }
+        }
+        outcome.into()
     }
 }

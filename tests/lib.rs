@@ -1,9 +1,4 @@
-#[must_use]
-pub fn does_it_work(
-    left: usize,
-    right: usize,
-) -> usize {
-    left + right
-}
+mod measure;
 
-mod unit;
+mod qubit;
+mod qureg;

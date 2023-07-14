@@ -2,27 +2,59 @@ use std::num::NonZeroU16;
 
 use num::{
     Complex,
-    Float,
+    Zero,
+};
+use rand::{
+    distributions::{
+        Bernoulli,
+        Distribution,
+    },
+    SeedableRng,
+};
+use rand_chacha::ChaCha8Rng;
+
+use crate::{
+    QFloat,
+    Qubit,
 };
 
-use crate::Qubit;
-
 /// Quantum register
-pub struct Qureg<T: Float> {
+pub struct Qureg<T>
+where
+    T: QFloat,
+{
+    rng:        ChaCha8Rng,
     num_qubits: NonZeroU16,
     amp:        Vec<Complex<T>>,
 }
 
-impl<T: Float> Qureg<T> {
+impl<T> Qureg<T>
+where
+    T: QFloat,
+{
     /// Initialize a new quantum register of `n` qubits in a zero state.
+    ///
+    /// Seed internal RNG with `seed`.
     #[must_use]
-    pub fn new(num_qubits: NonZeroU16) -> Self {
-        let mut amp = vec![Complex::from(T::zero()); 1 << num_qubits.get()];
+    pub fn new(
+        num_qubits: NonZeroU16,
+        seed: u64,
+    ) -> Self {
+        let mut amp = vec![Complex::zero(); 1 << num_qubits.get()];
         amp[0] = Complex::from(T::one());
         Self {
+            rng: ChaCha8Rng::seed_from_u64(seed),
             num_qubits,
             amp,
         }
+    }
+
+    pub fn bernoulli(
+        &mut self,
+        p: f64,
+    ) -> bool {
+        let d = Bernoulli::new(p).unwrap();
+        d.sample(&mut self.rng)
     }
 
     /// Get the number of qubits in this `Qureg`
