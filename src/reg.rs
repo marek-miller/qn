@@ -71,8 +71,7 @@ where
         &mut self,
         p: f64,
     ) -> Result<bool, BernoulliError> {
-        let d = Bernoulli::new(p)?;
-        Ok(d.sample(&mut self.rng))
+        Ok(Bernoulli::new(p)?.sample(&mut self.rng))
     }
 
     /// Get the number of qubits.
