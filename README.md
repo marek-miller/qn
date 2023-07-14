@@ -1,3 +1,3 @@
 # qn
 
-Non-local, thread-safe qubits transformation
+Non-local, thread-safe qubit transformation
