@@ -166,30 +166,31 @@ where
         let mut stm = self.stm.lock().unwrap();
 
         let mask = 1usize << self.index;
-        let amp_sq0 = stm
+        let amp_sq_1 = stm
             .as_slice()
             .par_iter()
             .enumerate()
-            .filter(|(i, _)| i & mask == 0)
+            .filter(|(i, _)| i & mask == mask)
             .map(|(_, a)| a.norm_sqr())
             .fold(|| T::zero(), |acc, a| acc + a)
             .sum();
 
         // project the state onto random outcome
-        let p = 1. - T::to_f64(&amp_sq0).unwrap();
+        let p = T::to_f64(&amp_sq_1).unwrap();
         let outcome = stm.bernoulli(p).unwrap();
 
         // zero the amplitudes corresponding to (1-outcome), normalize the rest
         let norm_factor = if outcome {
-            (T::one() - amp_sq0).sqrt()
+            amp_sq_1.sqrt()
         } else {
-            amp_sq0.sqrt()
+            (T::one() - amp_sq_1).sqrt()
         };
+        let outcome_shifted = if outcome { mask } else { 0 };
         stm.as_mut_slice()
             .par_iter_mut()
             .enumerate()
             .for_each(|(i, a)| {
-                if (i & mask) >> self.index == outcome.into() {
+                if i & mask == outcome_shifted {
                     *a /= norm_factor;
                 } else {
                     *a = Complex::zero();
