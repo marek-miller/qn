@@ -125,7 +125,7 @@ where
     /// assert!(qb0.is_from_same_qureg(&qb1));
     /// ```
     #[must_use]
-    pub fn is_from_same_qureg(
+    pub fn is_from_same_reg(
         &self,
         other_qubit: &Qubit<'a, T>,
     ) -> bool {
