@@ -1,3 +1,5 @@
+use std::f64::consts::SQRT_2;
+
 use qn::Bit;
 
 use crate::measure::{
@@ -53,5 +55,19 @@ fn m100_alternate() {
         qureg_set_real(&mut qureg, &[0., 1.]);
         let mut qubit = qureg.qubit(0).unwrap();
         assert_eq!(qubit.measure(), Bit::ONE);
+    }
+}
+
+#[test]
+fn state_persistent() {
+    let mut qureg = gen_qureg(1, 34983);
+
+    for _ in 0..100 {
+        qureg_set_real(&mut qureg, &[SQRT_2.recip(), SQRT_2.recip()]);
+        let mut qubit = qureg.qubit(0).unwrap();
+
+        let outcome = qubit.measure();
+        assert_eq!(qubit.measure(), outcome);
+        assert_eq!(qubit.measure(), outcome);
     }
 }

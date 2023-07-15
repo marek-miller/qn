@@ -134,6 +134,7 @@ where
         Arc::<_>::as_ptr(&self.qureg) == Arc::<_>::as_ptr(&other_qubit.qureg)
     }
 
+    #[must_use]
     /// Measure the qubit.
     pub fn measure(&mut self) -> Bit {
         let mut qureg = self.qureg.lock().unwrap();
@@ -145,11 +146,9 @@ where
         // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
         let mut amp_sq = [T::zero(); 2];
         for k in 0..upper_bits {
-            for j in 0..=1 {
-                for i in 0..lower_bits {
-                    amp_sq[j] +=
-                        amp_buf[i + lower_bits * (j + 2 * k)].norm_sqr();
-                }
+            for i in 0..lower_bits {
+                amp_sq[0] += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
+                amp_sq[1] += amp_buf[i + (2 * k + 1) * lower_bits].norm_sqr();
             }
         }
 
@@ -158,14 +157,14 @@ where
         let outcome = qureg.bernoulli(p).unwrap();
 
         // zero amplitudes corresponding to (1-outcome), normalize the rest
-        let outcome_idx = usize::from(outcome);
+        let out_idx = usize::from(outcome);
         let amp_buf = qureg.as_mut_slice();
-        let norm_factor = amp_sq[outcome_idx].sqrt();
+        let norm_factor = amp_sq[out_idx].sqrt();
         for k in 0..upper_bits {
             for i in 0..lower_bits {
-                amp_buf[i + lower_bits * ((1 - outcome_idx) + 2 * k)] =
+                amp_buf[i + (2 * k + out_idx) * lower_bits] /= norm_factor;
+                amp_buf[i + (2 * k + (1 - out_idx)) * lower_bits] =
                     Complex::zero();
-                amp_buf[i + lower_bits * (outcome_idx + 2 * k)] /= norm_factor;
             }
         }
         outcome.into()
