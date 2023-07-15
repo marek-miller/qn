@@ -22,3 +22,8 @@ criterion = "0.5.1"
 [[bench]]
 name = "my_benchmark"
 harness = false
+
+[profile.release]
+opt-level = 3
+strip = "debuginfo"
+lto = "fat"

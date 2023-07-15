@@ -21,6 +21,16 @@ fn stm_set_real(
         .for_each(|(x, a)| *a = x);
 }
 
+fn stm_set_imag(
+    stm: &mut System<f64>,
+    amps: &[f64],
+) {
+    amps.iter()
+        .map(|&x| Complex::new(0., x))
+        .zip(stm.as_mut_slice())
+        .for_each(|(x, a)| *a = x);
+}
+
 fn generate_stm_set_real(
     num_qubits: u16,
     seed: u64,
@@ -33,6 +43,7 @@ fn generate_stm_set_real(
 
 mod one_qubit;
 mod one_qubit_histogram;
+mod one_qubit_imag;
 mod one_qubit_large_sys;
 mod two_qubits;
 mod two_qubits_nonlocal;
