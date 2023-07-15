@@ -32,5 +32,6 @@ fn generate_qureg_set_real(
 }
 
 mod one_qubit;
+mod one_qubit_large_reg;
 mod two_qubits;
 mod two_qubits_nonlocal;
