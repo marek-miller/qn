@@ -19,7 +19,7 @@ use crate::{
     Qubit,
 };
 
-/// Quantum system
+/// Quantum system of qubits
 pub struct System<T>
 where
     T: Float,
