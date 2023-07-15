@@ -7,6 +7,12 @@ use num::{
     Complex,
     Zero,
 };
+use rayon::prelude::{
+    IndexedParallelIterator,
+    IntoParallelRefIterator,
+    IntoParallelRefMutIterator,
+    ParallelIterator,
+};
 
 // use rayon::{
 //     prelude::{
@@ -141,38 +147,54 @@ where
         Arc::<_>::as_ptr(&self.stm) == Arc::<_>::as_ptr(&other_qubit.stm)
     }
 
-    #[must_use]
     /// Measure the qubit.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use std::num::NonZeroU16;
+    /// # use qn::{Bit, System};
+    /// let num_qubits = NonZeroU16::new(2).unwrap();
+    /// let seed = 123;
+    /// let mut stm: System<f64> = System::new(num_qubits, seed);
+    /// let mut qubit = stm.qubit(0).unwrap();
+    ///
+    /// assert_eq!(qubit.measure(), Bit::ZERO);
+    /// ```
+    #[must_use]
     pub fn measure(&mut self) -> Bit {
         let mut stm = self.stm.lock().unwrap();
 
-        let shift = self.index;
         let mask = 1usize << self.index;
         let amp_sq0 = stm
             .as_slice()
-            .iter()
+            .par_iter()
             .enumerate()
             .filter(|(i, _)| i & mask == 0)
-            .fold(T::zero(), |acc, (_, a)| acc + a.norm_sqr());
+            .map(|(_, a)| a.norm_sqr())
+            .fold(|| T::zero(), |acc, a| acc + a)
+            .sum();
 
         // project the state onto random outcome
         let p = 1. - T::to_f64(&amp_sq0).unwrap();
         let outcome = stm.bernoulli(p).unwrap();
 
-        // zero amplitudes corresponding to (1-outcome), normalize the rest
+        // zero the amplitudes corresponding to (1-outcome), normalize the rest
         let norm_factor = if outcome {
             (T::one() - amp_sq0).sqrt()
         } else {
             amp_sq0.sqrt()
         };
-
-        for (i, a) in stm.as_mut_slice().iter_mut().enumerate() {
-            if (i & mask) >> shift == outcome.into() {
-                *a /= norm_factor;
-            } else {
-                *a = Complex::zero();
-            }
-        }
+        stm.as_mut_slice()
+            .par_iter_mut()
+            .enumerate()
+            .for_each(|(i, a)| {
+                if (i & mask) >> self.index == outcome.into() {
+                    *a /= norm_factor;
+                } else {
+                    *a = Complex::zero();
+                }
+            });
         outcome.into()
     }
 }

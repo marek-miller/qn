@@ -1,9 +1,12 @@
-use std::ops::{
-    AddAssign,
-    DivAssign,
-    MulAssign,
-    RemAssign,
-    SubAssign,
+use std::{
+    iter,
+    ops::{
+        AddAssign,
+        DivAssign,
+        MulAssign,
+        RemAssign,
+        SubAssign,
+    },
 };
 
 /// Floating point number abstraction
@@ -16,6 +19,7 @@ pub trait Float:
     + MulAssign<Self>
     + DivAssign<Self>
     + RemAssign<Self>
+    + iter::Sum
 {
 }
 

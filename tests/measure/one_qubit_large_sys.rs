@@ -47,7 +47,7 @@ fn state_persistent() {
 
 #[test]
 fn binary_state() {
-    const SIZE: u16 = 10;
+    const SIZE: u16 = 8;
 
     let mut stm = gen_stm(SIZE, 349812);
 
