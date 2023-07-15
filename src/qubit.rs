@@ -141,7 +141,7 @@ where
 
         let lower_bits = 1 << self.index;
         let upper_bits = 1 << (stm.num_qubits().get() - self.index - 1);
-        let amp_buf = stm.as_mut_slice();
+        let amp_buf = stm.as_slice();
 
         // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
         let mut amp_sq = [T::zero(); 2];
