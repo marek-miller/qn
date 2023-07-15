@@ -1,36 +1,28 @@
-use std::num::NonZeroU16;
+use qn::Bit;
 
-use num::Complex;
-use qn::{
-    Bit,
-    Register,
+use crate::measure::{
+    gen_qureg,
+    qureg_set_real,
 };
 
 #[test]
 fn zero_state() {
-    let num_qubits = NonZeroU16::new(1).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
-
+    let mut qureg = gen_qureg(1, 12);
     let mut qubit = qureg.qubit(0).unwrap();
     assert_eq!(qubit.measure(), Bit::ZERO);
 }
 
 #[test]
 fn one_state() {
-    let num_qubits = NonZeroU16::new(1).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
-
-    qureg.as_mut_slice()[0] = Complex::from(0.);
-    qureg.as_mut_slice()[1] = Complex::from(1.);
+    let mut qureg = gen_qureg(1, 123);
+    qureg_set_real(&mut qureg, &[0., 1.]);
     let mut qubit = qureg.qubit(0).unwrap();
     assert_eq!(qubit.measure(), Bit::ONE);
 }
 
 #[test]
 fn m100_zero_state() {
-    let num_qubits = NonZeroU16::new(1).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
-
+    let mut qureg = gen_qureg(1, 111);
     let mut qubit = qureg.qubit(0).unwrap();
 
     for _ in 0..100 {
@@ -40,11 +32,8 @@ fn m100_zero_state() {
 
 #[test]
 fn m100_one_state() {
-    let num_qubits = NonZeroU16::new(1).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
-    qureg.as_mut_slice()[0] = Complex::from(0.);
-    qureg.as_mut_slice()[1] = Complex::from(1.);
-
+    let mut qureg = gen_qureg(1, 1231);
+    qureg_set_real(&mut qureg, &[0., 1.]);
     let mut qubit = qureg.qubit(0).unwrap();
 
     for _ in 0..100 {
@@ -54,18 +43,14 @@ fn m100_one_state() {
 
 #[test]
 fn m100_alternate() {
-    let num_qubits = NonZeroU16::new(1).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut qureg = gen_qureg(1, 1234);
 
     for _ in 0..100 {
-        qureg.as_mut_slice()[0] = Complex::from(1.);
-        qureg.as_mut_slice()[1] = Complex::from(0.);
-
+        qureg_set_real(&mut qureg, &[1., 0.]);
         let mut qubit = qureg.qubit(0).unwrap();
         assert_eq!(qubit.measure(), Bit::ZERO);
 
-        qureg.as_mut_slice()[0] = Complex::from(0.);
-        qureg.as_mut_slice()[1] = Complex::from(1.);
+        qureg_set_real(&mut qureg, &[0., 1.]);
         let mut qubit = qureg.qubit(0).unwrap();
         assert_eq!(qubit.measure(), Bit::ONE);
     }
