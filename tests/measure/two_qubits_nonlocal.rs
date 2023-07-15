@@ -9,8 +9,8 @@ use qn::{
 };
 
 use crate::measure::{
-    generate_qureg_set_real,
-    qureg_set_real,
+    generate_stm_set_real,
+    stm_set_real,
 };
 
 fn measure_qubits(
@@ -27,106 +27,106 @@ fn measure_qubits(
 
 #[test]
 fn q2nloc_01() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[1., 0., 0., 0.]);
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[1., 0., 0., 0.]);
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ZERO, Bit::ZERO));
 }
 
 #[test]
 fn q2nloc_02() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 1., 0., 0.]);
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 1., 0., 0.]);
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ONE, Bit::ZERO));
 }
 
 #[test]
 fn q2nloc_03() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 0., 1., 0.]);
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 0., 1., 0.]);
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ZERO, Bit::ONE));
 }
 
 #[test]
 fn q2nloc_04() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 0., 0., 1.]);
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 0., 0., 1.]);
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ONE, Bit::ONE));
 }
 
 #[test]
 fn q2nloc_01_reverse() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[1., 0., 0., 0.]);
-    let qubits = qureg.qubit_pair(1, 0).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[1., 0., 0., 0.]);
+    let qubits = stm.qubit_pair(1, 0).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ZERO, Bit::ZERO));
 }
 
 #[test]
 fn q2nloc_02_reverse() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 1., 0., 0.]);
-    let qubits = qureg.qubit_pair(1, 0).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 1., 0., 0.]);
+    let qubits = stm.qubit_pair(1, 0).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ZERO, Bit::ONE));
 }
 
 #[test]
 fn q2nloc_03_reverse() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 0., 1., 0.]);
-    let qubits = qureg.qubit_pair(1, 0).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 0., 1., 0.]);
+    let qubits = stm.qubit_pair(1, 0).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ONE, Bit::ZERO));
 }
 
 #[test]
 fn q2nloc_04_reverse() {
-    let mut qureg = generate_qureg_set_real(2, 123, &[0., 0., 0., 1.]);
-    let qubits = qureg.qubit_pair(1, 0).unwrap();
+    let mut stm = generate_stm_set_real(2, 123, &[0., 0., 0., 1.]);
+    let qubits = stm.qubit_pair(1, 0).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome, (Bit::ONE, Bit::ONE));
 }
 
 #[test]
 fn q2nloc_entangled_01() {
-    let mut qureg = generate_qureg_set_real(
+    let mut stm = generate_stm_set_real(
         2,
         123,
         &[SQRT_2.recip(), 0., 0., SQRT_2.recip()],
     );
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome.0, outcome.1);
 }
 
 #[test]
 fn q2nloc_entangled_02() {
-    let mut qureg = generate_qureg_set_real(
+    let mut stm = generate_stm_set_real(
         2,
         123,
         &[0., SQRT_2.recip(), SQRT_2.recip(), 0.],
     );
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_ne!(outcome.0, outcome.1);
 }
 
 #[test]
 fn q2nloc_entangled_01_reps100() {
-    let mut qureg = generate_qureg_set_real(
+    let mut stm = generate_stm_set_real(
         2,
         123,
         &[SQRT_2.recip(), 0., 0., SQRT_2.recip()],
     );
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_eq!(outcome.0, outcome.1);
 
     for _ in 0..100 {
-        qureg_set_real(&mut qureg, &[SQRT_2.recip(), 0., 0., SQRT_2.recip()]);
-        let qubits = qureg.qubit_pair(0, 1).unwrap();
+        stm_set_real(&mut stm, &[SQRT_2.recip(), 0., 0., SQRT_2.recip()]);
+        let qubits = stm.qubit_pair(0, 1).unwrap();
         let outcome = measure_qubits(qubits).unwrap();
         assert_eq!(outcome.0, outcome.1);
     }
@@ -134,18 +134,18 @@ fn q2nloc_entangled_01_reps100() {
 
 #[test]
 fn q2nloc_entangled_02_reps100() {
-    let mut qureg = generate_qureg_set_real(
+    let mut stm = generate_stm_set_real(
         2,
         123,
         &[0., SQRT_2.recip(), SQRT_2.recip(), 0.],
     );
-    let qubits = qureg.qubit_pair(0, 1).unwrap();
+    let qubits = stm.qubit_pair(0, 1).unwrap();
     let outcome = measure_qubits(qubits).unwrap();
     assert_ne!(outcome.0, outcome.1);
 
     for _ in 0..100 {
-        qureg_set_real(&mut qureg, &[0., SQRT_2.recip(), SQRT_2.recip(), 0.]);
-        let qubits = qureg.qubit_pair(0, 1).unwrap();
+        stm_set_real(&mut stm, &[0., SQRT_2.recip(), SQRT_2.recip(), 0.]);
+        let qubits = stm.qubit_pair(0, 1).unwrap();
         let outcome = measure_qubits(qubits).unwrap();
         assert_ne!(outcome.0, outcome.1);
     }

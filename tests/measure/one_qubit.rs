@@ -3,29 +3,29 @@ use std::f64::consts::SQRT_2;
 use qn::Bit;
 
 use crate::measure::{
-    gen_qureg,
-    qureg_set_real,
+    gen_stm,
+    stm_set_real,
 };
 
 #[test]
 fn zero_state() {
-    let mut qureg = gen_qureg(1, 12);
-    let mut qubit = qureg.qubit(0).unwrap();
+    let mut stm = gen_stm(1, 12);
+    let mut qubit = stm.qubit(0).unwrap();
     assert_eq!(qubit.measure(), Bit::ZERO);
 }
 
 #[test]
 fn one_state() {
-    let mut qureg = gen_qureg(1, 123);
-    qureg_set_real(&mut qureg, &[0., 1.]);
-    let mut qubit = qureg.qubit(0).unwrap();
+    let mut stm = gen_stm(1, 123);
+    stm_set_real(&mut stm, &[0., 1.]);
+    let mut qubit = stm.qubit(0).unwrap();
     assert_eq!(qubit.measure(), Bit::ONE);
 }
 
 #[test]
 fn m100_zero_state() {
-    let mut qureg = gen_qureg(1, 111);
-    let mut qubit = qureg.qubit(0).unwrap();
+    let mut stm = gen_stm(1, 111);
+    let mut qubit = stm.qubit(0).unwrap();
 
     for _ in 0..100 {
         assert_eq!(qubit.measure(), Bit::ZERO);
@@ -34,9 +34,9 @@ fn m100_zero_state() {
 
 #[test]
 fn m100_one_state() {
-    let mut qureg = gen_qureg(1, 1231);
-    qureg_set_real(&mut qureg, &[0., 1.]);
-    let mut qubit = qureg.qubit(0).unwrap();
+    let mut stm = gen_stm(1, 1231);
+    stm_set_real(&mut stm, &[0., 1.]);
+    let mut qubit = stm.qubit(0).unwrap();
 
     for _ in 0..100 {
         assert_eq!(qubit.measure(), Bit::ONE);
@@ -45,26 +45,26 @@ fn m100_one_state() {
 
 #[test]
 fn m100_alternate() {
-    let mut qureg = gen_qureg(1, 1234);
+    let mut stm = gen_stm(1, 1234);
 
     for _ in 0..100 {
-        qureg_set_real(&mut qureg, &[1., 0.]);
-        let mut qubit = qureg.qubit(0).unwrap();
+        stm_set_real(&mut stm, &[1., 0.]);
+        let mut qubit = stm.qubit(0).unwrap();
         assert_eq!(qubit.measure(), Bit::ZERO);
 
-        qureg_set_real(&mut qureg, &[0., 1.]);
-        let mut qubit = qureg.qubit(0).unwrap();
+        stm_set_real(&mut stm, &[0., 1.]);
+        let mut qubit = stm.qubit(0).unwrap();
         assert_eq!(qubit.measure(), Bit::ONE);
     }
 }
 
 #[test]
 fn state_persistent() {
-    let mut qureg = gen_qureg(1, 34983);
+    let mut stm = gen_stm(1, 34983);
 
     for _ in 0..100 {
-        qureg_set_real(&mut qureg, &[SQRT_2.recip(), SQRT_2.recip()]);
-        let mut qubit = qureg.qubit(0).unwrap();
+        stm_set_real(&mut stm, &[SQRT_2.recip(), SQRT_2.recip()]);
+        let mut qubit = stm.qubit(0).unwrap();
 
         let outcome = qubit.measure();
         assert_eq!(qubit.measure(), outcome);

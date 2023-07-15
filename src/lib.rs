@@ -28,5 +28,5 @@ pub use qubit::{
     Qubit,
 };
 
-mod reg;
-pub use reg::Register;
+mod system;
+pub use system::System;

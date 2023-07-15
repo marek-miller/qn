@@ -9,36 +9,36 @@ use num::{
 };
 use qn::{
     Bit,
-    Register,
+    System,
 };
 
 #[test]
 fn get_qubit_01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut stm = System::<f32>::new(num_qubits, 1);
 
-    let qubit = qureg.qubit(0);
+    let qubit = stm.qubit(0);
     assert!(qubit.is_some());
 
-    let qubit = qureg.qubit(1);
+    let qubit = stm.qubit(1);
     assert!(qubit.is_some());
 
-    let qubit = qureg.qubit(2);
+    let qubit = stm.qubit(2);
     assert!(qubit.is_none());
 }
 
 #[test]
 fn get_qubit_pair01() {
     let num_qubits = NonZeroU16::try_from(2).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut stm = System::<f32>::new(num_qubits, 1);
 
-    let qb = qureg.qubit_pair(0, 1);
+    let qb = stm.qubit_pair(0, 1);
     assert!(qb.is_some());
 
-    let qb = qureg.qubit_pair(0, 0);
+    let qb = stm.qubit_pair(0, 0);
     assert!(qb.is_none());
 
-    let qb = qureg.qubit_pair(0, 2);
+    let qb = stm.qubit_pair(0, 2);
     assert!(qb.is_none());
 }
 
@@ -46,16 +46,16 @@ fn get_qubit_pair01() {
 fn get_qubit_iter01() {
     const SIZE: u16 = 5;
     let num_qubits = NonZeroU16::try_from(SIZE).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut stm = System::<f32>::new(num_qubits, 1);
 
-    for mut qb in qureg.qubit_iter() {
+    for mut qb in stm.qubit_iter() {
         assert_eq!(qb.measure(), Bit::ZERO);
     }
 
-    qureg.as_mut_slice()[0] = Complex::zero();
-    qureg.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
+    stm.as_mut_slice()[0] = Complex::zero();
+    stm.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
 
-    for mut qb in qureg.qubit_iter() {
+    for mut qb in stm.qubit_iter() {
         assert_eq!(qb.measure(), Bit::ONE);
     }
 }
@@ -64,17 +64,17 @@ fn get_qubit_iter01() {
 fn get_qubit_iter_collect() {
     const SIZE: u16 = 5;
     let num_qubits = NonZeroU16::try_from(SIZE).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut stm = System::<f32>::new(num_qubits, 1);
 
-    let qubits = qureg.qubit_iter().collect::<Vec<_>>();
+    let qubits = stm.qubit_iter().collect::<Vec<_>>();
     for mut qb in qubits {
         assert_eq!(qb.measure(), Bit::ZERO);
     }
 
-    qureg.as_mut_slice()[0] = Complex::zero();
-    qureg.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
+    stm.as_mut_slice()[0] = Complex::zero();
+    stm.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
 
-    let qubits = qureg.qubit_iter().collect::<Vec<_>>();
+    let qubits = stm.qubit_iter().collect::<Vec<_>>();
     for mut qb in qubits {
         assert_eq!(qb.measure(), Bit::ONE);
     }
@@ -84,17 +84,17 @@ fn get_qubit_iter_collect() {
 fn get_qubit_iter_collect_nonlocal() {
     const SIZE: u16 = 8;
     let num_qubits = NonZeroU16::try_from(SIZE).unwrap();
-    let mut qureg = Register::<f32>::new(num_qubits, 1);
+    let mut stm = System::<f32>::new(num_qubits, 1);
 
-    let qubits = qureg.qubit_iter().collect::<Vec<_>>();
+    let qubits = stm.qubit_iter().collect::<Vec<_>>();
     for mut qb in qubits {
         assert_eq!(qb.measure(), Bit::ZERO);
     }
 
-    qureg.as_mut_slice()[0] = Complex::zero();
-    qureg.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
+    stm.as_mut_slice()[0] = Complex::zero();
+    stm.as_mut_slice()[(1 << SIZE) - 1] = Complex::from(1.);
 
-    let mut qubits = qureg.qubit_iter().collect::<Vec<_>>();
+    let mut qubits = stm.qubit_iter().collect::<Vec<_>>();
     let (qubits_l, qubits_r) = qubits.split_at_mut(5);
 
     thread::scope(|s| {

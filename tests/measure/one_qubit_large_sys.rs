@@ -6,13 +6,13 @@ use num::{
 };
 use qn::Bit;
 
-use crate::measure::gen_qureg;
+use crate::measure::gen_stm;
 
 #[test]
 fn zero_state() {
-    let mut qureg = gen_qureg(10, 12);
+    let mut stm = gen_stm(10, 12);
     for i in 0..10 {
-        let mut qubit = qureg.qubit(i).unwrap();
+        let mut qubit = stm.qubit(i).unwrap();
         assert_eq!(qubit.measure(), Bit::ZERO);
     }
 }
@@ -20,9 +20,9 @@ fn zero_state() {
 #[test]
 fn one_state() {
     for i in 0..10 {
-        let mut qureg = gen_qureg(10, 123);
-        qureg.as_mut_slice()[1 << i] = Complex::from(1.);
-        let mut qubit = qureg.qubit(i).unwrap();
+        let mut stm = gen_stm(10, 123);
+        stm.as_mut_slice()[1 << i] = Complex::from(1.);
+        let mut qubit = stm.qubit(i).unwrap();
         assert_eq!(qubit.measure(), Bit::ONE);
     }
 }
@@ -30,11 +30,11 @@ fn one_state() {
 #[test]
 fn state_persistent() {
     for i in 0..10 {
-        let mut qureg = gen_qureg(10, 34983);
+        let mut stm = gen_stm(10, 34983);
         for _ in 0..100 {
-            qureg.as_mut_slice()[0] = Complex::from(SQRT_2.recip());
-            qureg.as_mut_slice()[1 << i] = Complex::from(SQRT_2.recip());
-            let mut qubit = qureg.qubit(i).unwrap();
+            stm.as_mut_slice()[0] = Complex::from(SQRT_2.recip());
+            stm.as_mut_slice()[1 << i] = Complex::from(SQRT_2.recip());
+            let mut qubit = stm.qubit(i).unwrap();
 
             let outcome = qubit.measure();
             assert_eq!(qubit.measure(), outcome);
@@ -47,14 +47,14 @@ fn state_persistent() {
 fn binary_state() {
     const SIZE: u16 = 10;
 
-    let mut qureg = gen_qureg(SIZE, 349812);
+    let mut stm = gen_stm(SIZE, 349812);
 
     for i in 0..1 << SIZE {
-        (0..1 << SIZE).for_each(|j| qureg.as_mut_slice()[j] = Complex::zero());
-        qureg.as_mut_slice()[i] = Complex::from(1.);
+        (0..1 << SIZE).for_each(|j| stm.as_mut_slice()[j] = Complex::zero());
+        stm.as_mut_slice()[i] = Complex::from(1.);
 
         for k in 0..SIZE {
-            let outcome = qureg.qubit(k).unwrap().measure();
+            let outcome = stm.qubit(k).unwrap().measure();
             if (i >> k & 1) == 0 {
                 assert_eq!(outcome, Bit::ZERO);
             } else {

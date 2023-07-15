@@ -1,2 +1,2 @@
-mod is_from_same_reg;
+mod is_from_same_sys;
 mod unit;

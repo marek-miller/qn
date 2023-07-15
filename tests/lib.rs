@@ -1,4 +1,4 @@
 mod measure;
 
 mod qubit;
-mod reg;
+mod system;

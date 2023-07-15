@@ -1,37 +1,37 @@
 use std::num::NonZeroU16;
 
 use num::Complex;
-use qn::Register;
+use qn::System;
 
-fn gen_qureg(
+fn gen_stm(
     num_qubits: u16,
     seed: u64,
-) -> Register<f64> {
+) -> System<f64> {
     let num_qubits = NonZeroU16::new(num_qubits).unwrap();
-    Register::new(num_qubits, seed)
+    System::new(num_qubits, seed)
 }
 
-fn qureg_set_real(
-    qureg: &mut Register<f64>,
+fn stm_set_real(
+    stm: &mut System<f64>,
     amps: &[f64],
 ) {
     amps.iter()
         .map(Complex::from)
-        .zip(qureg.as_mut_slice())
+        .zip(stm.as_mut_slice())
         .for_each(|(x, a)| *a = x);
 }
 
-fn generate_qureg_set_real(
+fn generate_stm_set_real(
     num_qubits: u16,
     seed: u64,
     amps: &[f64],
-) -> Register<f64> {
-    let mut qureg = gen_qureg(num_qubits, seed);
-    qureg_set_real(&mut qureg, amps);
-    qureg
+) -> System<f64> {
+    let mut stm = gen_stm(num_qubits, seed);
+    stm_set_real(&mut stm, amps);
+    stm
 }
 
 mod one_qubit;
-mod one_qubit_large_reg;
+mod one_qubit_large_sys;
 mod two_qubits;
 mod two_qubits_nonlocal;

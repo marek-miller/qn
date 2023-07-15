@@ -19,8 +19,8 @@ use crate::{
     Qubit,
 };
 
-/// Quantum register
-pub struct Register<T>
+/// Quantum system
+pub struct System<T>
 where
     T: Float,
 {
@@ -29,11 +29,11 @@ where
     amp:        Vec<Complex<T>>,
 }
 
-impl<T> Register<T>
+impl<T> System<T>
 where
     T: Float,
 {
-    /// Initialize a new quantum register of `n` qubits in the zero state.
+    /// Initialize a new quantum system of `n` qubits in the zero state.
     ///
     /// Seed internal RNG with `seed`.
     ///
@@ -41,12 +41,12 @@ where
     ///
     /// ```rust
     /// # use std::num::NonZeroU16;
-    /// # use qn::{Bit, Register};
+    /// # use qn::{Bit, System};
     /// let num_qubits = NonZeroU16::new(8).unwrap();
     /// let seed = 123;
-    /// let mut qureg: Register<f64> = Register::new(num_qubits, seed);
+    /// let mut stm: System<f64> = System::new(num_qubits, seed);
     ///
-    /// for mut qubit in qureg.qubit_iter() {
+    /// for mut qubit in stm.qubit_iter() {
     ///     assert_eq!(qubit.measure(), Bit::ZERO);
     /// }
     /// ```
@@ -117,7 +117,7 @@ where
         Qubit::new_pair(self, index1, index2)
     }
 
-    /// Create an iterator over all qubits in register.
+    /// Create an iterator over all qubits in system.
     pub fn qubit_iter(&mut self) -> impl Iterator<Item = Qubit<'_, T>> {
         Qubit::new_iter(self)
     }
