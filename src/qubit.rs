@@ -7,6 +7,13 @@ use num::{
     Complex,
     Zero,
 };
+use rayon::{
+    prelude::{
+        IndexedParallelIterator,
+        ParallelIterator,
+    },
+    slice::ParallelSlice,
+};
 
 use crate::{
     Float,
@@ -144,25 +151,22 @@ where
         let amp_buf = stm.as_slice();
 
         // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
-        let mut amp_sq = T::zero();
-        for k in 0..upper_bits {
-            for i in 0..lower_bits {
-                amp_sq += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
-                // amp_sq += amp_buf[i + (2 * k + 1) *
-                //  lower_bits].norm_sqr();     }
-            }
-        }
+        // let mut amp_sq = T::zero();
+        // for k in 0..upper_bits {
+        //     for i in 0..lower_bits {
+        //         amp_sq += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
+        //         // amp_sq += amp_buf[i + (2 * k + 1) *
+        //         //  lower_bits].norm_sqr();     }
+        //     }
+        // }
 
-        // let amp_sq = amp_buf
-        //     .par_chunks(lower_bits)
-        //     .step_by(2)
-        //     .map(|chunk| {
-        //         chunk
-        //             .par_iter()
-        //             .map(|x| x.norm_sqr())
-        //             .reduce(|| T::zero(), |acc, x| acc + x)
-        //     })
-        //     .reduce(|| T::zero(), |acc, x| acc + x);
+        let amp_sq = amp_buf
+            .par_chunks(lower_bits)
+            .step_by(2)
+            .map(|chunk| {
+                chunk.iter().fold(T::zero(), |acc, x| acc + x.norm_sqr())
+            })
+            .reduce(|| T::zero(), |acc, x| acc + x);
 
         // project the state onto random outcome
         let p = 1. - T::to_f64(&amp_sq).unwrap();

@@ -28,8 +28,8 @@ fn measure_qubit_20() {
 
     let mut stm = gen_stm(SIZE, 349812);
     stm.as_mut_slice()[0] = Complex::zero();
-    stm.as_mut_slice()[0b10000] = Complex::from(1.);
-    let outcome = stm.qubit(4).unwrap().measure();
+    stm.as_mut_slice()[1 << 8] = Complex::from(1.);
+    let outcome = stm.qubit(8).unwrap().measure();
     assert_eq!(outcome, Bit::ONE);
 }
 
