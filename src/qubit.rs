@@ -7,6 +7,7 @@ use num::{
     Complex,
     Zero,
 };
+use rayon::prelude::*;
 
 use crate::{
     Float,
@@ -144,22 +145,26 @@ where
         let amp_buf = stm.as_slice();
 
         // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
-        let mut amp_sq = [T::zero(); 2];
+        let mut amp_sq = T::zero();
         for k in 0..upper_bits {
             for i in 0..lower_bits {
-                amp_sq[0] += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
-                amp_sq[1] += amp_buf[i + (2 * k + 1) * lower_bits].norm_sqr();
+                // amp_sq0 += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
+                amp_sq += amp_buf[i + (2 * k + 1) * lower_bits].norm_sqr();
             }
         }
 
         // project the state onto random outcome
-        let p = T::to_f64(&amp_sq[1]).unwrap();
+        let p = T::to_f64(&amp_sq).unwrap();
         let outcome = stm.bernoulli(p).unwrap();
 
         // zero amplitudes corresponding to (1-outcome), normalize the rest
         let out_idx = usize::from(outcome);
         let amp_buf = stm.as_mut_slice();
-        let norm_factor = amp_sq[out_idx].sqrt();
+        let norm_factor = if outcome {
+            amp_sq.sqrt()
+        } else {
+            (T::one() - amp_sq).sqrt()
+        };
         for k in 0..upper_bits {
             for i in 0..lower_bits {
                 amp_buf[i + (2 * k + out_idx) * lower_bits] /= norm_factor;
