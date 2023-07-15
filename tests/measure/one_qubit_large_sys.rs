@@ -49,7 +49,7 @@ fn state_persistent() {
 fn binary_state() {
     const SIZE: u16 = 8;
 
-    let mut stm = gen_stm(SIZE, 349812);
+    let mut stm = gen_stm(SIZE, 349_812);
 
     for i in 0..1 << SIZE {
         (0..1 << SIZE).for_each(|j| stm.as_mut_slice()[j] = Complex::zero());

@@ -32,6 +32,7 @@ fn generate_stm_set_real(
 }
 
 mod one_qubit;
+mod one_qubit_histogram;
 mod one_qubit_large_sys;
 mod two_qubits;
 mod two_qubits_nonlocal;
