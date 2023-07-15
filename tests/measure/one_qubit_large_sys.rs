@@ -21,8 +21,10 @@ fn zero_state() {
 fn one_state() {
     for i in 0..10 {
         let mut stm = gen_stm(10, 123);
+        stm.as_mut_slice()[0] = Complex::zero();
         stm.as_mut_slice()[1 << i] = Complex::from(1.);
         let mut qubit = stm.qubit(i).unwrap();
+        println!("{i}");
         assert_eq!(qubit.measure(), Bit::ONE);
     }
 }
