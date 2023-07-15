@@ -67,7 +67,7 @@ where
     /// Draw from Bernoulli distribution with probability of success `p`.
     ///
     /// Uses internal RNG.
-    pub fn bernoulli(
+    pub(crate) fn bernoulli(
         &mut self,
         p: f64,
     ) -> Result<bool, BernoulliError> {

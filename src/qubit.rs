@@ -67,7 +67,7 @@ where
     /// Returns `None`
     /// - if any of indices is larger or equal than `qureg.num_qubits()`
     /// - if indices are equal
-    pub fn new_pair(
+    pub(crate) fn new_pair(
         qureg: &'a mut Register<T>,
         index1: u16,
         index2: u16,
@@ -92,7 +92,7 @@ where
     }
 
     /// Get iterator over all qubits in register
-    pub fn new_iter(
+    pub(crate) fn new_iter(
         qureg: &'a mut Register<T>
     ) -> impl Iterator<Item = Qubit<'a, T>> {
         let num_qubits = qureg.num_qubits().get();
