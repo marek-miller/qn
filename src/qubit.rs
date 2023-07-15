@@ -146,45 +146,31 @@ where
     pub fn measure(&mut self) -> Bit {
         let mut stm = self.stm.lock().unwrap();
 
-        let lower_bits = 1 << self.index;
-        let upper_bits = 1 << (stm.num_qubits().get() - self.index - 1);
-        let amp_buf = stm.as_slice();
-
-        // calculate sum of squares of prob. amplitudes for outcomes 0 and 1
-        let mut amp_sq = T::zero();
-        for k in 0..upper_bits {
-            for i in 0..lower_bits {
-                amp_sq += amp_buf[i + (2 * k) * lower_bits].norm_sqr();
-                // amp_sq += amp_buf[i + (2 * k + 1) *
-                //  lower_bits].norm_sqr();     }
-            }
-        }
-
-        // let amp_sq = amp_buf
-        //     .par_chunks(lower_bits)
-        //     .step_by(2)
-        //     .map(|chunk| {
-        //         chunk.iter().fold(T::zero(), |acc, x| acc + x.norm_sqr())
-        //     })
-        //     .reduce(|| T::zero(), |acc, x| acc + x);
+        let shift = self.index;
+        let mask = 1usize << self.index;
+        let amp_sq0 = stm
+            .as_slice()
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| i & mask == 0)
+            .fold(T::zero(), |acc, (_, a)| acc + a.norm_sqr());
 
         // project the state onto random outcome
-        let p = 1. - T::to_f64(&amp_sq).unwrap();
+        let p = 1. - T::to_f64(&amp_sq0).unwrap();
         let outcome = stm.bernoulli(p).unwrap();
 
         // zero amplitudes corresponding to (1-outcome), normalize the rest
-        let out_idx = usize::from(outcome);
-        let amp_buf = stm.as_mut_slice();
         let norm_factor = if outcome {
-            (T::one() - amp_sq).sqrt()
+            (T::one() - amp_sq0).sqrt()
         } else {
-            amp_sq.sqrt()
+            amp_sq0.sqrt()
         };
-        for k in 0..upper_bits {
-            for i in 0..lower_bits {
-                amp_buf[i + (2 * k + out_idx) * lower_bits] /= norm_factor;
-                amp_buf[i + (2 * k + (1 - out_idx)) * lower_bits] =
-                    Complex::zero();
+
+        for (i, a) in stm.as_mut_slice().iter_mut().enumerate() {
+            if (i & mask) >> shift == outcome.into() {
+                *a /= norm_factor;
+            } else {
+                *a = Complex::zero();
             }
         }
         outcome.into()

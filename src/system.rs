@@ -55,7 +55,7 @@ where
         num_qubits: NonZeroU16,
         seed: u64,
     ) -> Self {
-        let mut amp = vec![Complex::zero(); 1 << num_qubits.get()];
+        let mut amp = vec![Complex::zero(); 1usize << num_qubits.get()];
         amp[0] = Complex::from(T::one());
         Self {
             rng: ChaCha8Rng::seed_from_u64(seed),
