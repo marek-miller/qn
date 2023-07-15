@@ -122,7 +122,7 @@ where
     /// let mut qureg: Register<f64> = Register::new(num_qubits, seed);
     /// let (qb0, qb1) = qureg.qubit_pair(0, 1).unwrap();
     ///
-    /// assert!(qb0.is_from_same_qureg(&qb1));
+    /// assert!(qb0.is_from_same_reg(&qb1));
     /// ```
     #[must_use]
     pub fn is_from_same_reg(
