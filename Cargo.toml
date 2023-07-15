@@ -1,5 +1,5 @@
 [package]
-categories = ["science", "simulation", "science:physics"]
+categories = ["science", "simulation"]
 description = "Non-local qubits"
 edition = "2021"
 homepage = "https://github.com/marek-miller/qn"
