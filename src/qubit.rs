@@ -58,7 +58,7 @@ where
 {
     /// Derive a single qubit from a quantum system.
     ///
-    /// Returns `None` is index is larger or equal than `stm.num_qubits()`
+    /// Returns `None`, if index is larger or equal than `stm.num_qubits()`
     pub fn new(
         stm: &'a mut System<T>,
         index: u16,

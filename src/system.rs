@@ -94,7 +94,7 @@ where
 
     /// Get a qubit.
     ///
-    /// Returns `None` if index is larger or equal than `self.num_qubits()`
+    /// Returns `None`, if index is larger or equal than `self.num_qubits()`
     pub fn qubit(
         &mut self,
         index: u16,

@@ -8,7 +8,7 @@ license = "MIT"
 name = "qn"
 readme = "README.md"
 repository = "https://github.com/marek-miller/qn.git"
-version = "0.1.3"
+version = "0.2.0"
 
 [dependencies]
 num = "0.4.1"
