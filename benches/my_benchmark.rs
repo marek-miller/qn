@@ -1,4 +1,3 @@
-#![feature(portable_simd)]
 use std::num::NonZeroU16;
 
 use criterion::{

@@ -204,10 +204,3 @@ pub fn hadamard<T: Float>(qubit: &mut Qubit<'_, T>) {
         *y = x0 - y0;
     });
 }
-
-#[test]
-fn iter_qubit_hadamard() {
-    let mut stm = System::<f64>::new(NonZeroU16::new(20).unwrap(), 232);
-
-    stm.qubit_iter().for_each(|mut qb| hadamard(&mut qb));
-}

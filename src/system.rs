@@ -125,6 +125,7 @@ where
     }
 
     /// Iterator over amplitudes around the `site` in the tensor product space
+    #[must_use]
     pub fn tensor_iter(
         &self,
         site: u16,

@@ -19,6 +19,8 @@ transformations.
     register is already faster than with
     [`quest_bind`](https://github.com/marek-miller/quest-bind.git). What about
     raw QuEST?
+  - Tensor iterators to turn single-qubit transformations in a multi-qubit register
+    into serial operations on vector of amplitudes
 
 ## TODO
 
