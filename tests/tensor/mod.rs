@@ -200,27 +200,27 @@ fn check_tensor_iter_nk(
     let mut count_0 = 0;
     let mut count_1 = 0;
 
-    for (val_0, val_1) in result {
-        let val_0 = val_0 & mask;
-        let hi_0 = (val_0 >> (site + 1)) << (site + 1);
-        let lo_0 = val_0 - hi_0;
-        let hi_0 = hi_0 >> 1;
-        let val_shift_0 = lo_0 + hi_0;
-
-        assert_eq!(val_shift_0, count_0);
-
-        count_0 += 1;
-
-        let val_1 = val_1 & mask;
-        let hi_1 = (val_1 >> (site + 1)) << (site + 1);
-        let lo_1 = val_1 - hi_1;
-        let hi_1 = hi_1 >> 1;
-        let val_shift_1 = lo_1 + hi_1;
-
-        assert_eq!(val_shift_1, count_1);
-
-        count_1 += 1;
+    for (&val_0, &val_1) in result {
+        check_val_update_counter(val_0, mask, site, &mut count_0);
+        check_val_update_counter(val_1, mask, site, &mut count_1);
     }
+}
+
+fn check_val_update_counter(
+    val: usize,
+    mask: usize,
+    site: usize,
+    count: &mut usize,
+) {
+    let val_0 = val & mask;
+    let hi_0 = (val_0 >> (site + 1)) << (site + 1);
+    let lo_0 = val_0 - hi_0;
+    let hi_0 = hi_0 >> 1;
+    let val_shift_0 = lo_0 + hi_0;
+
+    assert_eq!(val_shift_0, *count);
+
+    *count += 1;
 }
 
 test_cases! {
@@ -256,25 +256,8 @@ fn check_tensor_iter_mut_nk(
     let mut count_1 = 0;
 
     for (&mut val_0, &mut val_1) in result {
-        let val_0 = val_0 & mask;
-        let hi_0 = (val_0 >> (site + 1)) << (site + 1);
-        let lo_0 = val_0 - hi_0;
-        let hi_0 = hi_0 >> 1;
-        let val_shift_0 = lo_0 + hi_0;
-
-        assert_eq!(val_shift_0, count_0);
-
-        count_0 += 1;
-
-        let val_1 = val_1 & mask;
-        let hi_1 = (val_1 >> (site + 1)) << (site + 1);
-        let lo_1 = val_1 - hi_1;
-        let hi_1 = hi_1 >> 1;
-        let val_shift_1 = lo_1 + hi_1;
-
-        assert_eq!(val_shift_1, count_1);
-
-        count_1 += 1;
+        check_val_update_counter(val_0, mask, site, &mut count_0);
+        check_val_update_counter(val_1, mask, site, &mut count_1);
     }
 }
 
