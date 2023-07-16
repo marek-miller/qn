@@ -14,13 +14,6 @@ use rayon::prelude::{
     ParallelIterator,
 };
 
-// use rayon::{
-//     prelude::{
-//         IndexedParallelIterator,
-//         ParallelIterator,
-//     },
-//     slice::ParallelSlice,
-// };
 use crate::{
     Float,
     System,
@@ -198,4 +191,23 @@ where
             });
         outcome.into()
     }
+}
+
+/// Apply Hadamard gate on qubit.
+pub fn hadamard<T: Float>(qubit: &mut Qubit<'_, T>) {
+    let mut stm = qubit.stm.lock().unwrap();
+    let tensor_iter = stm.tensor_iter_mut(qubit.index);
+    tensor_iter.for_each(|(x, y)| {
+        let x0 = *x;
+        let y0 = *y;
+        *x = x0 + y0;
+        *y = x0 - y0;
+    });
+}
+
+#[test]
+fn iter_qubit_hadamard() {
+    let mut stm = System::<f64>::new(NonZeroU16::new(20).unwrap(), 232);
+
+    stm.qubit_iter().for_each(|mut qb| hadamard(&mut qb));
 }

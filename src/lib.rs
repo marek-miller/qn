@@ -1,3 +1,4 @@
+#![feature(iter_array_chunks)]
 use std::{
     iter,
     ops::{
@@ -28,6 +29,7 @@ impl Float for f64 {}
 
 mod qubit;
 pub use qubit::{
+    hadamard,
     Bit,
     Qubit,
 };
@@ -36,4 +38,7 @@ mod system;
 pub use system::System;
 
 mod tensor_iter;
-pub use tensor_iter::TensorIter;
+pub use tensor_iter::{
+    TensorIter,
+    TensorIterMut,
+};

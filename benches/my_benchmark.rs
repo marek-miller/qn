@@ -6,7 +6,10 @@ use criterion::{
     criterion_main,
     Criterion,
 };
-use qn::System;
+use qn::{
+    hadamard,
+    System,
+};
 
 fn bench(c: &mut Criterion) {
     const NUM_QUBITS: u16 = 20;
@@ -19,7 +22,8 @@ fn bench(c: &mut Criterion) {
     let mut stm = System::<f64>::new(num_qubits, 349_812);
     let mut qubit = stm.qubit(15).unwrap();
 
-    group.bench_function("1. binary state", |b| b.iter(|| qubit.measure()));
+    group.bench_function("measure", |b| b.iter(|| qubit.measure()));
+    group.bench_function("hadamard", |b| b.iter(|| hadamard(&mut qubit)));
 
     group.finish();
 }

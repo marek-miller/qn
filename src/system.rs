@@ -15,8 +15,10 @@ use rand::{
 use rand_chacha::ChaCha8Rng;
 
 use crate::{
+    tensor_iter::TensorIterMut,
     Float,
     Qubit,
+    TensorIter,
 };
 
 /// Quantum system of qubits
@@ -120,5 +122,22 @@ where
     /// Create an iterator over all qubits in system.
     pub fn qubit_iter(&mut self) -> impl Iterator<Item = Qubit<'_, T>> {
         Qubit::new_iter(self)
+    }
+
+    /// Iterator over amplitudes around the `site` in the tensor product space
+    pub fn tensor_iter(
+        &self,
+        site: u16,
+    ) -> TensorIter<'_, Complex<T>> {
+        TensorIter::new(self.as_slice(), site as usize)
+    }
+
+    /// Iterator over mutable amplitudes around the `site` in the tensor product
+    /// space
+    pub fn tensor_iter_mut(
+        &mut self,
+        site: u16,
+    ) -> TensorIterMut<'_, Complex<T>> {
+        TensorIterMut::new(self.as_mut_slice(), site as usize)
     }
 }

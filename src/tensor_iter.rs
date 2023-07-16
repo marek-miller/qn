@@ -10,13 +10,12 @@ impl<'a, T> TensorIter<'a, T> {
     pub fn new(
         buf: &'a [T],
         site: usize,
-        dimension: usize,
     ) -> Self {
-        assert!(dimension > site);
+        assert!(buf.len() > 1 << site);
         Self {
             buf,
             lower_bits: 1usize << site,
-            upper_bits: 1usize << (dimension - site - 1),
+            upper_bits: buf.len() / (1usize << (site + 1)),
             lower_index: 0,
             upper_index: 0,
         }
@@ -57,13 +56,14 @@ impl<'a, T> TensorIterMut<'a, T> {
     pub fn new(
         buf: &'a mut [T],
         site: usize,
-        dimension: usize,
     ) -> Self {
-        assert!(dimension > site);
+        assert!(buf.len() > 1 << site);
+        let upper_bits = buf.len() / (1usize << (site + 1));
+
         Self {
             buf,
             lower_bits: 1usize << site,
-            upper_bits: 1usize << (dimension - site - 1),
+            upper_bits,
             lower_index: 0,
             upper_index: 0,
         }
@@ -108,7 +108,7 @@ fn tensor_iter_10() {
     const SITE: usize = 0;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&0b0, &0b1),]);
 }
@@ -119,7 +119,7 @@ fn tensor_iter_20() {
     const SITE: usize = 0;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&0b00, &0b01), (&0b10, &0b11)]);
 }
@@ -130,7 +130,7 @@ fn tensor_iter_21() {
     const SITE: usize = 1;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&0b00, &0b10), (&0b01, &0b11)]);
 }
@@ -141,7 +141,7 @@ fn tensor_iter_30() {
     const SITE: usize = 0;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
@@ -160,7 +160,7 @@ fn tensor_iter_31() {
     const SITE: usize = 1;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
@@ -179,7 +179,7 @@ fn tensor_iter_32() {
     const SITE: usize = 2;
     let reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result = TensorIter::new(&reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIter::new(&reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
@@ -198,8 +198,7 @@ fn tensor_iter_mut_10() {
     const SITE: usize = 0;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&mut 0b0, &mut 0b1),]);
 }
@@ -210,8 +209,7 @@ fn tensor_iter_mut_20() {
     const SITE: usize = 0;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&mut 0b00, &mut 0b01), (&mut 0b10, &mut 0b11)]);
 }
@@ -222,8 +220,7 @@ fn tensor_iter_mut_21() {
     const SITE: usize = 1;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(result, &[(&mut 0b00, &mut 0b10), (&mut 0b01, &mut 0b11)]);
 }
@@ -234,8 +231,7 @@ fn tensor_iter_mut_30() {
     const SITE: usize = 0;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
@@ -254,8 +250,7 @@ fn tensor_iter_mut_31() {
     const SITE: usize = 1;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
@@ -274,8 +269,7 @@ fn tensor_iter_mut_32() {
     const SITE: usize = 2;
     let mut reg = (0..1 << DIMENSION).collect::<Vec<_>>();
 
-    let result =
-        TensorIterMut::new(&mut reg, SITE, DIMENSION).collect::<Vec<_>>();
+    let result = TensorIterMut::new(&mut reg, SITE).collect::<Vec<_>>();
 
     assert_eq!(
         result,
