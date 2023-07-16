@@ -185,7 +185,6 @@ fn tensor_iter_mut_32() {
     );
 }
 
-#[allow(clippy::explicit_counter_loop)]
 fn check_tensor_iter_nk(
     (dim, site): (usize, usize),
     _: (),
@@ -239,7 +238,6 @@ test_cases! {
     tensor_iter_nk_2124: check_tensor_iter_nk (21,20), (), ();
 }
 
-#[allow(clippy::explicit_counter_loop)]
 fn check_tensor_iter_mut_nk(
     (dim, site): (usize, usize),
     _: (),
