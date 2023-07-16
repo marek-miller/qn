@@ -34,3 +34,6 @@ pub use qubit::{
 
 mod system;
 pub use system::System;
+
+mod tensor_iter;
+pub use tensor_iter::TensorIter;
